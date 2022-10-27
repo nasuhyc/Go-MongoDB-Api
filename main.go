@@ -20,6 +20,8 @@ func main() {
 	td := app.UserHandler{Service: services.NewUserService(UserRepositoryDb)}
 
 	appRoute.Post("/api/user/", td.CreateUser)
+	appRoute.Get("/api/users/", td.GetAllUser)
+	appRoute.Delete("/api/user/:id", td.DeleteUser)
 	appRoute.Listen(":8080")
 
 }

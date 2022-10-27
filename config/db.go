@@ -4,11 +4,11 @@ import (
 	"context"
 	"log"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 func EnvMongoURI() string {
@@ -24,15 +24,14 @@ func EnvMongoURI() string {
 }
 
 func ConnectDB() *mongo.Client {
-	client, err := mongo.NewClient(options.Client().ApplyURI(EnvMongoURI()))
+
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
-	ctx, _ := context.WithTimeout(context.Background(), 20*time.Second)
-	err = client.Connect(ctx)
-	err = client.Ping(ctx, nil)
-	if err != nil {
-		log.Fatalln(err)
+
+	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
+		panic(err)
 	}
 	return client
 }

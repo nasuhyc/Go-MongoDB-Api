@@ -4,6 +4,8 @@ import (
 	"Go-MongoDb-Api/dto"
 	"Go-MongoDb-Api/models"
 	"Go-MongoDb-Api/repository"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type DefaultUserService struct {
@@ -12,6 +14,8 @@ type DefaultUserService struct {
 
 type UserService interface {
 	UserInsert(user models.User) (*dto.UserDTO, error)
+	UserGetAll() ([]models.User, error)
+	UserDelete(id primitive.ObjectID) (bool, error)
 }
 
 func (u DefaultUserService) UserInsert(user models.User) (*dto.UserDTO, error) {
@@ -28,6 +32,23 @@ func (u DefaultUserService) UserInsert(user models.User) (*dto.UserDTO, error) {
 	res = dto.UserDTO{Status: result}
 	return &res, nil
 
+}
+
+func (u DefaultUserService) UserGetAll() ([]models.User, error) {
+	result, err := u.Repo.GetAll()
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (u DefaultUserService) UserDelete(id primitive.ObjectID) (bool, error) {
+	result, err := u.Repo.Delete(id)
+
+	if err != nil || result == false {
+		return false, err
+	}
+	return true, nil
 }
 
 func NewUserService(Repo repository.UserRepository) DefaultUserService {
